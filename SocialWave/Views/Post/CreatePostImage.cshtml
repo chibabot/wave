@@ -1,0 +1,172 @@
+﻿@model SocialWave.Models.ViewModels.PostImageViewModel
+@{
+    ViewData["Title"] = "Новый пост";
+}
+
+<style>
+    .container {
+        margin-top: 100px;
+    }
+
+    .post {
+        border: 1px solid #FF4500;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 0px;
+    }
+
+    .form-label {
+        color: black;
+    }
+
+
+    .form-control {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white border: none;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 20px;
+    }
+
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+    .custom-file-label {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: black;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        cursor: pointer;
+    }
+
+    .custom-file-input {
+        display: none;
+    }
+
+    .btn-primary {
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-size: 18px;
+        background-color: #9C27B0;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .custom-border {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #FFA500, #FF4500);
+        margin: 40px 0;
+    }
+
+    .info-text {
+        background: linear-gradient(to right, #FFA500, #FF4500);
+        -webkit-background-clip: text;
+        color: transparent;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+    }
+
+    .body {
+        border: 1px solid #FF4500;
+        border-radius: 8px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-bottom: 80px;
+    }
+        
+    .btn-primary:hover {
+        background-color: #7B1FA2;
+    }
+
+    .btn-primary:focus {
+        box-shadow: none;
+    }
+
+    .text-danger {
+        color: #FF5252;
+    }
+
+    .strong-red {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    #imagePreview {
+        margin-top: 10px;
+    }
+
+</style>
+
+@if (TempData["CreateError"] != null)
+{
+    <div class="alert alert-danger strong-red" role="alert">
+        @TempData["CreateError"]
+    </div>
+}
+
+<div class="container">
+    <div class="custom-border" style="margin-top: 20px"></div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="post">
+                <div class="info-text"><h2 class="text-center mb-4">@ViewData["Title"]</h2></div>
+                <form id="postForm" asp-action="CreatePostImage" asp-controller="Post" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Описание:</label>
+                        <textarea class="form-control" rows="5" asp-for="Description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3 text-center">
+                        <label for="formFile" class="form-label">Выберите фото:</label>
+                        <div class="custom-file">
+                            <input type="file" class="form-control custom-file-input" id="formFile" name="ImageFile" accept="image/*" onchange="previewImage(event)">
+                            <label class="custom-file-label text-primary" for="formFile"><i class="bi bi-images"></i></label>
+                        </div>
+                        <div id="imagePreview"></div>
+                    </div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-outline-primary" onclick="submitForm()"><i class="bi bi-exposure"></i>Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="custom-border"></div>
+</div>
+
+<script>
+    function previewImage(event) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var output = document.getElementById('imagePreview');
+            output.innerHTML = '<img src="' + reader.result + '" class="img-fluid" alt="Preview">';
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function submitForm() {
+        var fileInput = document.getElementById('formFile');
+        if (fileInput.files.length > 0) {
+            var file = fileInput.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                var imageBytesInput = document.getElementById('imageBytes');
+                imageBytesInput.value = Array.from(new Uint8Array(reader.result)).join(',');
+                document.getElementById('postForm').submit();
+            }
+            reader.readAsArrayBuffer(file);
+        }
+        else {
+            var errorMessageElement = document.getElementById('errorMessage');
+            errorMessageElement.innerText = 'Please select an image.';
+        }
+    }
+</script>

@@ -1,0 +1,81 @@
+﻿@using System.Collections.Generic;
+@using SocialWave.Models.ConcreteClasses;
+@using SocialWave.Extensions;
+
+@model IEnumerable<User>
+
+@{
+    var User = ViewData["User"] as User;
+}
+
+<style>
+    .user {
+        border: 1px solid #FF4500;
+        border-radius: 8px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: 5px;
+        padding-right: 5px;
+        margin-bottom: 80px;
+    }
+
+    .custom-border {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #FFA500, #FF4500);
+        margin: 40px 0;
+    }
+
+    .info-text {
+        background: linear-gradient(to right, #FFA500, #FF4500);
+        -webkit-background-clip: text;
+        color: transparent;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h2 class="info-text">ПоВолне с @User.Name.CutName()..</h2>
+    </div>
+</div>
+<div class="custom-border"></div>
+
+@if (Model.Count() != 0)
+{
+    @foreach (User user in Model)
+    {
+        <div class="text-center">
+            <div class="user">
+                @if (user.PictureProfile == null)
+                {
+                    <div class="text-xxl-start">
+                        <form asp-action="UserPageWithParams" asp-controller="User" method="get">
+                            <input type="hidden" name="name" value="@user.Name" />
+                            <button type="submit" class="btn text-dark"><i class="bi bi-person-circle me-2"></i>@user.Name.CutName()</button>
+                        </form>
+                    </div>
+                    <p>Описание: @user.Description.CutDescription()</p>
+                }
+                else
+                {
+                    <form asp-action="UserPageWithParams" asp-controller="User" method="get">
+                        <input type="hidden" name="name" value="@user.Name" />
+                        <button class="btn text-dark"><img src="data:image/png;base64,@(Convert.ToBase64String(user.PictureProfile))" class="img-fluid rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;" /> @user.Name.CutName()</button>
+                    </form>
+                    <p>Описание: @user.Description.CutDescription()</p>
+                }
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center">
+        <h7>
+            Никто ещё не влился с @User.Name.CutName()
+        </h7>
+    </div>
+}
